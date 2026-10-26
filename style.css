@@ -13,3 +13,6 @@ textarea{width:100%;font:inherit;border:1px solid #cbd5e1;border-radius:8px;padd
 dialog{border:0;border-radius:14px;width:min(92vw,380px)}label{display:block;margin:8px 0;font-size:14px}
 select,input{display:block;width:100%;font:16px inherit;padding:8px;margin-top:3px;border:1px solid #cbd5e1;border-radius:8px}
 .pri{background:#0f172a;color:#fff}table{width:100%;border-collapse:collapse;font-size:14px}td{padding:3px 0}canvas{width:100%}
+
+.tog{font-size:14px;font-weight:600;padding:6px 14px;border-radius:999px;border:2px solid #94a3b8;min-height:34px}.tog.home{background:#dcfce7;border-color:#16a34a;color:#14532d}.tog.office{background:#dbeafe;border-color:#2563eb;color:#1e3a8a}.tog.unset{background:#fff;border-style:dashed;color:#64748b}
+.lbl{font-size:14px;margin:10px 0 4px}.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{padding:8px 12px;border-radius:999px;border:1px solid #cbd5e1;background:#f8fafc;font-size:15px}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}

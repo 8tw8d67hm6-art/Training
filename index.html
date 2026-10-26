@@ -19,7 +19,7 @@
 <dialog id="dlg"><form method="dialog" id="f"><h3 id="dTitle"></h3>
 <label>Session<select id="dType"></select></label>
 <label id="otherWrap" hidden>New session type<input id="dOther" placeholder="e.g. Yoga"></label>
-<label>Duration (mins)<input id="dMin" type="number" min="0" inputmode="numeric"></label>
+<div class="lbl">How long? <small>(tap to pick)</small></div><div id="durs" class="chips"></div><label id="customWrap" hidden>Custom minutes<input id="dMin" type="number" min="1" inputmode="numeric" placeholder="e.g. 50"></label>
 <label>Note<input id="dNote"></label>
 <div class="bar"><button value="save" class="pri">Save</button><button value="clear">Clear</button><button value="cancel">Cancel</button></div></form></dialog>
 <script src="app.js"></script></body></html>

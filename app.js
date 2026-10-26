@@ -1,16 +1,16 @@
 const LBL={run:'Run',bike:'Bike',pool:'Pool swim',sea:'Sea swim',gym:'Gym',core:'Core',padel:'Padel',other:'Other'};
 'use strict';
 const KEY='trainingPlanner.v1',DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],SLOTS=['Morning','Lunch','Evening'];
-const BASE={'Walk':['#a3e635','other',30],'Easy Run':['#60a5fa','run',40],'Key Run':['#2563eb','run',50],'Long Run':['#1e3a8a','run',90],'Bike':['#f59e0b','bike',45],'Long Ride':['#b45309','bike',120],'Pool Swim':['#06b6d4','pool',40],'Sea Swim':['#0e7490','sea',40],'Padel':['#ec4899','padel',60],'Core':['#f43f5e','core',20],'Legs in Gym':['#a855f7','gym',45],'Upper in Gym':['#7c3aed','gym',45],'Rest':['#94a3b8','rest',0],'Coffee':['#78350f','other',0]};
+const BASE={'Walk':['#a3e635','other'],'Easy Run':['#60a5fa','run'],'Key Run':['#2563eb','run'],'Long Run':['#1e3a8a','run'],'Bike':['#f59e0b','bike'],'Long Ride':['#b45309','bike'],'Pool Swim':['#06b6d4','pool'],'Sea Swim':['#0e7490','sea'],'Padel':['#ec4899','padel'],'Core':['#f43f5e','core'],'Legs in Gym':['#a855f7','gym'],'Upper in Gym':['#7c3aed','gym'],'Rest':['#94a3b8','rest'],'Coffee':['#78350f','other']};
 const PAL=['#ec4899','#14b8a6','#ef4444','#84cc16','#f97316'];
 const $=id=>document.getElementById(id);
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function monday(d){d=new Date(d.getFullYear(),d.getMonth(),d.getDate());d.setDate(d.getDate()-((d.getDay()+6)%7));return d;}
 function addDays(s,n){const [y,m,d]=s.split('-').map(Number);return iso(new Date(y,m-1,d+n));}
 function fmt(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
-function blank(){return{days:DAYS.map((_,i)=>({loc:i<5?'office':null,slots:SLOTS.map(()=>null),notes:''}))};}
+function blank(){return{days:DAYS.map((_,i)=>({loc:null,slots:SLOTS.map(()=>null),notes:''}))};}
 function s(t,n){return{type:t,mins:null,note:n||''};}
-function example(){const w=blank(),d=w.days;
+function example(){const w=blank(),d=w.days;d[0].loc='office';d[3].loc='office';d[4].loc='office';
  d[0].slots=[s('Walk'),s('Legs in Gym'),s('Easy Run')];
  d[1].loc='home';d[1].slots=[s('Upper in Gym'),s('Bike'),null];
  d[2].loc='home';d[2].slots=[s('Upper in Gym'),s('Key Run'),s('Bike')];
@@ -21,28 +21,28 @@ let st;try{st=JSON.parse(localStorage.getItem(KEY));}catch(e){}
 if(!st||!st.weeks)st={weeks:{'2026-10-26':example()},custom:[],current:null};
 st.current=st.current||(st.weeks[iso(monday(new Date()))]?iso(monday(new Date())):'2026-10-26');
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){alert('Could not save – please export a backup.');}}
-function types(){const t={...BASE};(st.custom||[]).forEach((c,i)=>t[c]=[PAL[i%PAL.length],'other',30]);return t;}
+function types(){const t={...BASE};(st.custom||[]).forEach((c,i)=>t[c]=[PAL[i%PAL.length],'other']);return t;}
 function week(){return st.weeks[st.current];}
 function render(){const T=types(),w=week();$('wkLabel').textContent='w/c '+fmt(st.current);const m=$('days');m.innerHTML='';
  if(!w){m.innerHTML='<div class="card">No plan for this week yet. Tap “New week”.</div>';}
  else w.days.forEach((d,di)=>{const el=document.createElement('div');el.className='day';
   const date=fmt(addDays(st.current,di)).replace(/ \d{4}$/,'');
-  el.innerHTML='<div class="dh"><span>'+DAYS[di]+' <small>'+date+'</small></span>'+(di<5?'<button class="tog '+d.loc+'">'+(d.loc==='home'?'Home':'Office')+'</button>':'')+'</div>';
-  if(di<5)el.querySelector('.tog').onclick=()=>{d.loc=d.loc==='home'?'office':'home';save();render();};
+  el.innerHTML='<div class="dh"><span>'+DAYS[di]+' <small>'+date+'</small></span>'+'<button class="tog '+(d.loc||'unset')+'" aria-label="Office or home – tap to change">'+(d.loc==='home'?'🏠 Home':d.loc==='office'?'🏢 Office':'— Office/Home')+'</button></div>';
+  el.querySelector('.tog').onclick=()=>{d.loc=d.loc==='office'?'home':d.loc==='home'?null:'office';save();render();};
   SLOTS.forEach((sn,si)=>{const v=d.slots[si],r=document.createElement('div');r.className='slot';
    if(v){r.style.borderLeftColor=(T[v.type]||['#64748b'])[0];r.style.background=(T[v.type]||['#64748b'])[0]+'22';}
-   r.innerHTML='<b>'+sn+'</b><span>'+(v?esc(v.type)+(v.mins?' · '+v.mins+' min':'')+(v.note?' <small>('+esc(v.note)+')</small>':''):'<small>Tap to add</small>')+'</span>';
+   r.innerHTML='<b>'+sn+'</b><span>'+(v?esc(v.type)+(v.mins?' · '+dur(v.mins):'')+(v.note?' <small>('+esc(v.note)+')</small>':''):'<small>Tap to add</small>')+'</span>';
    r.onclick=()=>edit(di,si);el.appendChild(r);});
   const ta=document.createElement('textarea');ta.placeholder='Notes';ta.value=d.notes||'';ta.oninput=()=>{d.notes=ta.value;save();};el.appendChild(ta);m.appendChild(el);});
  summary();chart();}
 function esc(x){return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function stats(w){const T=types(),o={mins:0,run:0,bike:0,pool:0,sea:0,gym:0,core:0,padel:0,other:0,count:0,counts:{}};if(!w)return o;
- w.days.forEach(d=>d.slots.forEach(v=>{if(!v)return;const t=T[v.type]||['','other',30];if(t[1]==='rest')return;
-  const mn=v.mins!=null&&v.mins!==''?Number(v.mins):t[2];o.mins+=mn;o[t[1]]+=mn;o.count++;o.counts[v.type]=(o.counts[v.type]||0)+1;}));return o;}
+function stats(w){const T=types(),o={mins:0,run:0,bike:0,pool:0,sea:0,gym:0,core:0,padel:0,other:0,count:0,untimed:0,counts:{}};if(!w)return o;
+ w.days.forEach(d=>d.slots.forEach(v=>{if(!v)return;const t=T[v.type]||['','other'];if(t[1]==='rest')return;
+  o.count++;const mn=v.mins!=null&&v.mins!==''?Number(v.mins):0;if(!mn)o.untimed++;o.mins+=mn;o[t[1]]+=mn;o.counts[v.type]=(o.counts[v.type]||0)+1;}));return o;}
 function summary(){const o=stats(week());const h=x=>(x/60).toFixed(1)+' h';
- $('summary').innerHTML='<h2>This week</h2><table><tr><td>Sessions</td><td>'+o.count+'</td></tr><tr><td>Total time*</td><td>'+h(o.mins)+'</td></tr>'+
+ $('summary').innerHTML='<h2>This week</h2><table><tr><td>Sessions</td><td>'+o.count+'</td></tr><tr><td>Total time</td><td>'+h(o.mins)+'</td></tr>'+
  Object.keys(LBL).map(k=>'<tr><td>'+LBL[k]+'</td><td>'+h(o[k])+'</td></tr>').join('')+'</table><p><small>'+
- Object.entries(o.counts).map(([k,v])=>esc(k)+' ×'+v).join(', ')+'</small></p><p><small>*Uses typical durations where none entered.</small></p>';}
+ Object.entries(o.counts).map(([k,v])=>esc(k)+' ×'+v).join(', ')+'</small></p>'+(o.untimed?'<p><small>'+o.untimed+' session'+(o.untimed>1?'s':'')+' without a time</small></p>':'');}
 function chart(){const c=$('chart'),x=c.getContext('2d'),W=c.width=c.clientWidth*2||600,H=c.height=360;x.clearRect(0,0,W,H);
  const ks=Object.keys(st.weeks).sort().slice(-10),cols={run:'#2563eb',bike:'#f59e0b',pool:'#06b6d4',sea:'#0e7490',gym:'#7c3aed',core:'#f43f5e',padel:'#ec4899',other:'#a3e635'};
  const data=ks.map(k=>stats(st.weeks[k])),mx=Math.max(60,...data.map(d=>d.mins)),bw=W/Math.max(ks.length,1);
@@ -50,13 +50,21 @@ function chart(){const c=$('chart'),x=c.getContext('2d'),W=c.width=c.clientWidth
   x.fillStyle='#0f172a';x.fillText(fmt(ks[i]).slice(0,6),i*bw+bw*.1,H-10);x.fillText(Math.round(d.mins/60*10)/10+'h',i*bw+bw*.2,y-6);});}
 let cur;function edit(di,si){cur=[di,si];const v=week().days[di].slots[si],sel=$('dType');
  sel.innerHTML=Object.keys(types()).map(t=>'<option>'+esc(t)+'</option>').join('')+'<option value="__other">Other…</option>';
- sel.value=v?v.type:'Easy Run';$('dMin').value=v&&v.mins!=null?v.mins:'';$('dNote').value=v?v.note:'';$('otherWrap').hidden=true;$('dOther').value='';
+ sel.value=v?v.type:'Easy Run';setDur(v&&v.mins!=null?v.mins:null);$('dNote').value=v?v.note:'';$('otherWrap').hidden=true;$('dOther').value='';
  $('dTitle').textContent=DAYS[di]+' – '+SLOTS[si];$('dlg').showModal();}
 $('dType').onchange=()=>{$('otherWrap').hidden=$('dType').value!=='__other';};
+const DUR=[15,20,30,45,60,75,90,120,150,180];let pick=null;
+function dur(m){m=Number(m);return m>=120?(m/60)+' h':m+' min';}
+function chips(){$('durs').innerHTML=DUR.map(m=>'<button type="button" class="chip'+(pick===m?' on':'')+'" data-m="'+m+'">'+dur(m)+'</button>').join('')+
+ '<button type="button" class="chip'+(pick==='c'?' on':'')+'" data-m="c">Custom</button>';
+ $('customWrap').hidden=pick!=='c';
+ $('durs').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const m=b.dataset.m;pick=m==='c'?'c':(pick===Number(m)?null:Number(m));chips();if(pick==='c')$('dMin').focus();});}
+function setDur(m){if(m==null||m===''){pick=null;$('dMin').value='';}else if(DUR.includes(Number(m))){pick=Number(m);$('dMin').value='';}else{pick='c';$('dMin').value=m;}chips();}
+function selMins(){if(pick==='c'){const n=Number($('dMin').value);return n>0?n:null;}return pick;}
 $('dlg').addEventListener('close',()=>{const r=$('dlg').returnValue,[di,si]=cur,d=week().days[di];
  if(r==='clear')d.slots[si]=null;
  if(r==='save'){let t=$('dType').value;if(t==='__other'){t=$('dOther').value.trim();if(!t)return;if(!types()[t])st.custom.push(t);}
-  const mn=$('dMin').value;d.slots[si]={type:t,mins:mn===''?null:Number(mn),note:$('dNote').value.trim()};}
+  const mn=selMins();d.slots[si]={type:t,mins:mn,note:$('dNote').value.trim()};}
  save();render();});
 $('prev').onclick=()=>{st.current=addDays(st.current,-7);save();render();};
 $('next').onclick=()=>{st.current=addDays(st.current,7);save();render();};
