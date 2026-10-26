@@ -1,6 +1,7 @@
+const LBL={run:'Run',bike:'Bike',pool:'Pool swim',sea:'Sea swim',gym:'Gym',core:'Core',padel:'Padel',other:'Other'};
 'use strict';
 const KEY='trainingPlanner.v1',DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],SLOTS=['Morning','Lunch','Evening'];
-const BASE={'Walk':['#a3e635','other',30],'Easy Run':['#60a5fa','run',40],'Key Run':['#2563eb','run',50],'Long Run':['#1e3a8a','run',90],'Bike':['#f59e0b','bike',45],'Long Ride':['#b45309','bike',120],'Swim':['#06b6d4','swim',40],'Padel':['#ec4899','other',60],'Legs in Gym':['#a855f7','gym',45],'Upper in Gym':['#7c3aed','gym',45],'Rest':['#94a3b8','rest',0],'Coffee':['#78350f','other',0]};
+const BASE={'Walk':['#a3e635','other',30],'Easy Run':['#60a5fa','run',40],'Key Run':['#2563eb','run',50],'Long Run':['#1e3a8a','run',90],'Bike':['#f59e0b','bike',45],'Long Ride':['#b45309','bike',120],'Pool Swim':['#06b6d4','pool',40],'Sea Swim':['#0e7490','sea',40],'Padel':['#ec4899','padel',60],'Core':['#f43f5e','core',20],'Legs in Gym':['#a855f7','gym',45],'Upper in Gym':['#7c3aed','gym',45],'Rest':['#94a3b8','rest',0],'Coffee':['#78350f','other',0]};
 const PAL=['#ec4899','#14b8a6','#ef4444','#84cc16','#f97316'];
 const $=id=>document.getElementById(id);
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -13,7 +14,7 @@ function example(){const w=blank(),d=w.days;
  d[0].slots=[s('Walk'),s('Legs in Gym'),s('Easy Run')];
  d[1].loc='home';d[1].slots=[s('Upper in Gym'),s('Bike'),null];
  d[2].loc='home';d[2].slots=[s('Upper in Gym'),s('Key Run'),s('Bike')];
- d[3].slots=[s('Coffee'),s('Legs in Gym'),s('Swim')];
+ d[3].slots=[s('Coffee'),s('Legs in Gym'),s('Pool Swim')];
  d[4].slots=[s('Easy Run'),s('Upper in Gym','or Swim'),null];
  d[5].slots=[s('Long Run'),null,null];d[6].slots=[s('Long Ride'),null,null];return w;}
 let st;try{st=JSON.parse(localStorage.getItem(KEY));}catch(e){}
@@ -35,15 +36,15 @@ function render(){const T=types(),w=week();$('wkLabel').textContent='w/c '+fmt(s
   const ta=document.createElement('textarea');ta.placeholder='Notes';ta.value=d.notes||'';ta.oninput=()=>{d.notes=ta.value;save();};el.appendChild(ta);m.appendChild(el);});
  summary();chart();}
 function esc(x){return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function stats(w){const T=types(),o={mins:0,run:0,bike:0,swim:0,gym:0,other:0,count:0,counts:{}};if(!w)return o;
+function stats(w){const T=types(),o={mins:0,run:0,bike:0,pool:0,sea:0,gym:0,core:0,padel:0,other:0,count:0,counts:{}};if(!w)return o;
  w.days.forEach(d=>d.slots.forEach(v=>{if(!v)return;const t=T[v.type]||['','other',30];if(t[1]==='rest')return;
   const mn=v.mins!=null&&v.mins!==''?Number(v.mins):t[2];o.mins+=mn;o[t[1]]+=mn;o.count++;o.counts[v.type]=(o.counts[v.type]||0)+1;}));return o;}
 function summary(){const o=stats(week());const h=x=>(x/60).toFixed(1)+' h';
  $('summary').innerHTML='<h2>This week</h2><table><tr><td>Sessions</td><td>'+o.count+'</td></tr><tr><td>Total time*</td><td>'+h(o.mins)+'</td></tr>'+
- ['run','bike','swim','gym','other'].map(k=>'<tr><td>'+k[0].toUpperCase()+k.slice(1)+'</td><td>'+h(o[k])+'</td></tr>').join('')+'</table><p><small>'+
+ Object.keys(LBL).map(k=>'<tr><td>'+LBL[k]+'</td><td>'+h(o[k])+'</td></tr>').join('')+'</table><p><small>'+
  Object.entries(o.counts).map(([k,v])=>esc(k)+' ×'+v).join(', ')+'</small></p><p><small>*Uses typical durations where none entered.</small></p>';}
 function chart(){const c=$('chart'),x=c.getContext('2d'),W=c.width=c.clientWidth*2||600,H=c.height=360;x.clearRect(0,0,W,H);
- const ks=Object.keys(st.weeks).sort().slice(-10),cols={run:'#2563eb',bike:'#f59e0b',swim:'#06b6d4',gym:'#7c3aed',other:'#a3e635'};
+ const ks=Object.keys(st.weeks).sort().slice(-10),cols={run:'#2563eb',bike:'#f59e0b',pool:'#06b6d4',sea:'#0e7490',gym:'#7c3aed',core:'#f43f5e',padel:'#ec4899',other:'#a3e635'};
  const data=ks.map(k=>stats(st.weeks[k])),mx=Math.max(60,...data.map(d=>d.mins)),bw=W/Math.max(ks.length,1);
  x.font='22px sans-serif';data.forEach((d,i)=>{let y=H-40;Object.keys(cols).forEach(k=>{const hh=d[k]/mx*(H-80);x.fillStyle=cols[k];x.fillRect(i*bw+bw*.15,y-hh,bw*.7,hh);y-=hh;});
   x.fillStyle='#0f172a';x.fillText(fmt(ks[i]).slice(0,6),i*bw+bw*.1,H-10);x.fillText(Math.round(d.mins/60*10)/10+'h',i*bw+bw*.2,y-6);});}
