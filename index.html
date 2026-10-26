@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Training Planner</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css"></head><body>
+<header><h1>Training Planner</h1>
+<div class="wk"><button id="prev" aria-label="Previous week">‹</button><span id="wkLabel"></span><button id="next" aria-label="Next week">›</button></div>
+<div class="bar"><button id="newWeek">New week</button><button id="exp">Export backup</button><label class="btn">Import<input type="file" id="imp" accept="application/json" hidden></label></div></header>
+<main id="days"></main>
+<section class="card" id="summary"></section>
+<section class="card"><h2>History</h2><canvas id="chart" height="180"></canvas></section>
+<dialog id="dlg"><form method="dialog" id="f"><h3 id="dTitle"></h3>
+<label>Session<select id="dType"></select></label>
+<label id="otherWrap" hidden>New session type<input id="dOther" placeholder="e.g. Yoga"></label>
+<label>Duration (mins)<input id="dMin" type="number" min="0" inputmode="numeric"></label>
+<label>Note<input id="dNote"></label>
+<div class="bar"><button value="save" class="pri">Save</button><button value="clear">Clear</button><button value="cancel">Cancel</button></div></form></dialog>
+<script src="app.js"></script></body></html>
