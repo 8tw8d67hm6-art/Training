@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="style.css"></head><body>
 <header><h1>Training Planner</h1>
 <div class="wk"><button id="prev" aria-label="Previous week">‹</button><span id="wkLabel"></span><button id="next" aria-label="Next week">›</button></div>
-<div class="bar"><button id="newWeek">New week</button><button id="exp">Export backup</button><label class="btn">Import<input type="file" id="imp" accept="application/json" hidden></label></div></header>
+<div class="bar"><button id="newWeek">New week</button></div></header>
 <main id="days"></main>
 <section class="card" id="summary"></section>
 <section class="card"><h2>History</h2><canvas id="chart" height="180"></canvas></section>
@@ -22,4 +22,5 @@
 <div class="lbl">How long? <small>(tap to pick)</small></div><div id="durs" class="chips"></div><label id="customWrap" hidden>Custom minutes<input id="dMin" type="number" min="1" inputmode="numeric" placeholder="e.g. 50"></label>
 <label>Note<input id="dNote"></label>
 <div class="bar"><button value="save" class="pri">Save</button><button value="clear">Clear</button><button value="cancel">Cancel</button></div></form></dialog>
+<details style="margin:24px 12px;opacity:.6;font-size:13px"><summary>Backup</summary><p><button id="exp">Export backup</button> <label class="btn">Import<input type="file" id="imp" accept="application/json" hidden></label></p></details>
 <script src="app.js"></script></body></html>
