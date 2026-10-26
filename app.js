@@ -1,6 +1,6 @@
 'use strict';
 const KEY='trainingPlanner.v1',DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],SLOTS=['Morning','Lunch','Evening'];
-const BASE={'Walk':['#a3e635','other',30],'Easy Run':['#60a5fa','run',40],'Key Run':['#2563eb','run',50],'Long Run':['#1e3a8a','run',90],'Bike':['#f59e0b','bike',45],'Long Ride':['#b45309','bike',120],'Swim':['#06b6d4','swim',40],'Legs in Gym':['#a855f7','gym',45],'Upper in Gym':['#7c3aed','gym',45],'Rest':['#94a3b8','rest',0],'Coffee':['#78350f','other',0]};
+const BASE={'Walk':['#a3e635','other',30],'Easy Run':['#60a5fa','run',40],'Key Run':['#2563eb','run',50],'Long Run':['#1e3a8a','run',90],'Bike':['#f59e0b','bike',45],'Long Ride':['#b45309','bike',120],'Swim':['#06b6d4','swim',40],'Padel':['#ec4899','other',60],'Legs in Gym':['#a855f7','gym',45],'Upper in Gym':['#7c3aed','gym',45],'Rest':['#94a3b8','rest',0],'Coffee':['#78350f','other',0]};
 const PAL=['#ec4899','#14b8a6','#ef4444','#84cc16','#f97316'];
 const $=id=>document.getElementById(id);
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
